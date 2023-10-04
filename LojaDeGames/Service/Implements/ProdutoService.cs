@@ -75,6 +75,8 @@ namespace LojaDeGames.Service.Implements
 
             //Acredito que esse ternário esteja redundante
             produto.Categoria = produto.Categoria is not null ? _context.Categorias.FirstOrDefault(t => t.Id == produto.Categoria.Id) : null;
+            produto.Usuario = produto.Usuario is not null ? await _context.Users.FirstOrDefaultAsync(u => u.Id == produto.Usuario.Id) : null;
+
 
             _context.Entry(ProdutoUpdate).State = EntityState.Detached;
             _context.Entry(produto).State = EntityState.Modified;
@@ -95,6 +97,7 @@ namespace LojaDeGames.Service.Implements
             }
 
             produto.Categoria = produto.Categoria is not null ? _context.Categorias.FirstOrDefault(t => t.Id == produto.Categoria.Id) : null;
+            produto.Usuario = produto.Usuario is not null ? await _context.Users.FirstOrDefaultAsync(u => u.Id == produto.Usuario.Id) : null;
 
             await _context.Produtos.AddAsync(produto);
             await _context.SaveChangesAsync();

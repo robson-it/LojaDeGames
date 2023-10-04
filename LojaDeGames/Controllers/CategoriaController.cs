@@ -1,10 +1,12 @@
 ﻿using FluentValidation;
 using LojaDeGames.Model;
 using LojaDeGames.Service;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LojaDeGames.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("~/categorias")]
     public class CategoriaController : ControllerBase
@@ -46,7 +48,7 @@ namespace LojaDeGames.Controllers
             return Ok(await _categoriaService.GetByTipo(tipo));
         }
 
-        [HttpPost]
+        [HttpPost("cadastrar")]
         public async Task<ActionResult> Create([FromBody] Categoria categoria)
         {
             var ValidarCategoria = await _categoriaValidator.ValidateAsync(categoria);

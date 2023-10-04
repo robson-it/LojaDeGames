@@ -15,15 +15,24 @@ namespace LojaDeGames.Data
         {
             modelBuilder.Entity<Produto>().ToTable("TB_PPRODUTOS");
             modelBuilder.Entity<Categoria>().ToTable("TB_CATEGORIAS");
+            modelBuilder.Entity<User>().ToTable("TB_USUARIOS");
+
             _ = modelBuilder.Entity<Produto>()
                 .HasOne(_ => _.Categoria)
                 .WithMany(t => t.Produto)
                 .HasForeignKey("CategoriaId")
                 .OnDelete(DeleteBehavior.Cascade);
+
+            _ = modelBuilder.Entity<Produto>()
+                .HasOne(_ => _.Usuario)
+                .WithMany(u => u.Produto)
+                .HasForeignKey("UserId")
+                .OnDelete(DeleteBehavior.Cascade);
         }
 
         public DbSet<Produto> Produtos { get; set; } = null!;
         public DbSet<Categoria> Categorias { get; set; } = null!;
+        public DbSet<User> Users { get; set; } = null!;
 
 
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

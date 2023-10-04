@@ -31,5 +31,6 @@ namespace LojaDeGames.Model
         public string Foto { get; set; } = string.Empty;
 
         public virtual Categoria? Categoria { get; set; }
+        public virtual User? Usuario { get; set; }
     }
 }

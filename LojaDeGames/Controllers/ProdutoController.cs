@@ -1,10 +1,13 @@
 ﻿using FluentValidation;
 using LojaDeGames.Model;
 using LojaDeGames.Service;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LojaDeGames.Controllers
 {
+
+    [Authorize]
     [ApiController]
     [Route("~/produtos")]
     public class ProdutoController : ControllerBase
@@ -53,7 +56,7 @@ namespace LojaDeGames.Controllers
             return Ok(await _produtoService.GetByIntervaloDePreco(precoInicial, precoFinal));
         }
 
-        [HttpPost]
+        [HttpPost("cadastrar")]
         public async Task<ActionResult> Create([FromBody] Produto produto)
         {
             var ValidarProduto = await _produtoValidator.ValidateAsync(produto);
@@ -70,6 +73,44 @@ namespace LojaDeGames.Controllers
 
             return CreatedAtAction(nameof(GetById), new { id = produto.Id }, produto);
         }
+
+        [HttpPost("cadastrarLista")]
+        public async Task<ActionResult> CreateList([FromBody] ICollection<Produto> produtos)
+        {
+            var itens = "";
+            foreach (var produto in produtos) {
+                var ValidarProduto = await _produtoValidator.ValidateAsync(produto);
+                if (!ValidarProduto.IsValid)
+                {
+                    //return StatusCode(StatusCodes.Status400BadRequest, ValidarProduto);
+                    itens += "\n O Produto: " + produto.Nome + " não é válido! Erro: " + ValidarProduto;
+                    continue;
+                }
+                var Resposta = await _produtoService.Create(produto);
+
+                if (Resposta is null)
+                {
+                    //return BadRequest("Categoria não encontrada!");
+                    itens += "\n A categoria do Produto: " + produto.Nome + " não foi encontrada! Erro: " + ValidarProduto;
+                    continue;
+
+                }
+
+                //return CreatedAtAction(nameof(GetById), new { id = produto.Id }, produto);
+                itens += "\n O Produto: " + produto.Nome + " foi cadastrado com sucesso!\n" 
+                    + "[INFO] => \n "
+                    + "Id:" + produto.Id + "\n"
+                    + "Nome:" + produto.Nome + "\n"
+                    + "Descrição:" + produto.Descricao + "\n"
+                    + "Plataformas Disponíveis:" + produto.Console + "\n"
+                    + "Preço:" + produto.Preco + "\n"
+                    + "Imagem de Capa:" + produto.Foto + "\n"
+                    + "Categoria:" + produto.Categoria.Tipo + "\n"
+                    + "Usuário que Cadastrou:" + produto.Usuario.Nome + "\n";
+            }
+            return  Ok(itens);
+        }
+
 
         [HttpPut]
         public async Task<ActionResult> Update([FromBody] Produto produto)
